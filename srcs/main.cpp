@@ -84,7 +84,7 @@ int updateManhattan(int oldH, int tile, int oldPos, int newPos, const std::vecto
 static int heuristic(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n, int type = 0)
 {
 	if (type == 0) return manhattan(state, pos, n);
-	else if (type == 1) return linearConflict(state, pos, n);
+	else if (type == 1) return manhattan(state, pos, n);
 	else if (type == 2) return manhattan(state, pos, n);
 	return manhattan(state, pos, n);
 }
@@ -101,7 +101,7 @@ bool solve(std::vector<int>& grid, int n, int type = 0)
 	std::unordered_set<unsigned long long int> vis;
 
 	int h = heuristic(grid, pos, n, type);
-	int zero = std::find(grid.begin(), grid.end(), 0) - grid.begin();
+	int zero = (int)(std::find(grid.begin(), grid.end(), 0) - grid.begin());
 	pq.push({h, 0, grid, zero, h});
 
 	while (!pq.empty())
@@ -152,8 +152,11 @@ int main()
 	//std::vector<int> grid = {5,8,6,1,0,2,3,4,7}; // no
 	int n = 4;
 	//std::vector<int> grid = {9,14,1,5,15,12,0,4,2,6,3,8,10,7,13,11}; // no
+	//std::vector<int> grid = {5,9,2,6,1,14,0,13,3,12,7,8,11,4,10,15}; // no
 	//std::vector<int> grid = {7,4,6,15,14,10,9,5,12,13,2,11,0,1,3,8}; // yes
-	std::vector<int> grid = {0,2,3,4,1,13,14,5,12,11,15,6,10,9,8,7}; // yes
+	//std::vector<int> grid = {0,2,3,4,1,13,14,5,12,11,15,6,10,9,8,7}; // yes
+	//std::vector<int> grid = {10,14,5,1,4,9,3,11,2,7,13,6,15,12,0,8}; // yes
+	std::vector<int> grid = {1,4,14,12,5,8,11,15,9,10,13,0,2,7,3,6}; // yes
 
 	auto check = [&]() -> bool
 	{
@@ -165,7 +168,7 @@ int main()
 		if (n & 1) return (cnt & 1);
 		else
 		{
-			int z = std::find(grid.begin(), grid.end(), 0) - grid.begin();
+			int z = (int)(std::find(grid.begin(), grid.end(), 0) - grid.begin());
 			int r = n - (z / n);
 			return ((cnt + r) % 2 == 1);
 		}
@@ -178,7 +181,7 @@ int main()
 	else std::cout << "NO" << std::endl;
 
 	auto end = std::chrono::high_resolution_clock::now();
-	double duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+	double duration = (double)(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
 	std::cout << "Execution Time: " << duration / 1e6 << " seconds\n";
 
 	return 0;
