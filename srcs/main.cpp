@@ -136,17 +136,17 @@ bool solve(std::vector<int>& grid, int n, int type = 0)
 
 int main()
 {
-	/*int n;
-	  std::cin >> n;
-	  std::vector<int> grid(n * n);
-	  for (int i = 0; i < n * n; i++)
-	  std::cin >> grid[i];*/
+	int n;
+	std::cin >> n;
+	std::vector<int> grid(n * n);
+	for (int i = 0; i < n * n; i++)
+		std::cin >> grid[i];
 
 	auto start = std::chrono::high_resolution_clock::now();
 
 	// ------------------------- Test cases -------------------------
-	int n = 3;
-	std::vector<int> grid = {2,3,7,6,1,4,5,8,0}; // yes
+	//int n = 3;
+	//std::vector<int> grid = {2,3,7,6,1,4,5,8,0}; // yes
 	//std::vector<int> grid = {7,4,3,8,0,1,5,6,2}; // yes
 	//std::vector<int> grid = {4,7,1,3,0,8,5,6,2}; // no
 	//std::vector<int> grid = {5,8,6,1,0,2,3,4,7}; // no
