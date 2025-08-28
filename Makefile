@@ -2,7 +2,7 @@ NAME = n-puzzle
 
 CPP = g++ -std=c++20
 
-CFLAGS = -Wall -Wextra -Werror -Wno-shadow -Wconversion
+CFLAGS = -Wall -Werror -Wextra -Wno-shadow -Wconversion
 
 SRC_DIR = ./srcs/
 	  

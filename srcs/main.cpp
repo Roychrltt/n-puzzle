@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 
-int dirs[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+int dirs[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
 
 static std::vector<int> makeGoal(int n)
 {
@@ -96,20 +96,30 @@ bool solve(std::vector<int>& grid, int n, int type = 0)
 	for (int i = 0; i < n * n; i++)
 		pos[goal[i]] = {i / n, i % n};
 
-	using Node = std::tuple<int, int, std::vector<int>, int, int>;
+	using Node = std::tuple<int, int, std::vector<int>, int, int, std::string>;
 	std::priority_queue<Node, std::vector<Node>, std::greater<Node>> pq;
 	std::unordered_set<unsigned long long int> vis;
 
 	int h = heuristic(grid, pos, n, type);
 	int zero = (int)(std::find(grid.begin(), grid.end(), 0) - grid.begin());
-	pq.push({h, 0, grid, zero, h});
+	pq.push({h, 0, grid, zero, h, ""});
 
+	unsigned long long int cnt = 0, mx = 0;
 	while (!pq.empty())
 	{
-		auto [f, g, state, z, h] = pq.top();
+		cnt++;
+		mx = std::max(mx, (unsigned long long int)pq.size());
+		auto [f, g, state, z, h, move] = pq.top();
 		pq.pop();
 
-		if (state == goal) return true;
+		if (state == goal)
+		{
+			std::cout << "Time complexity: " << cnt << " states selected in total" << std::endl;
+			std::cout << "Size complexity: at most " << mx << " states ever represented in memory at the same time" << std::endl;
+			std::cout << "Number of moves to achieve the final state: " << move.size() << std::endl;
+			std::cout << "Solution: " << move << std::endl;
+			return true;
+		}
 
 		unsigned long long int num = 0;
 		for (int i : state) num = ((num << 4) | i);
@@ -117,9 +127,9 @@ bool solve(std::vector<int>& grid, int n, int type = 0)
 		vis.insert(num);
 
 		int x = z / n, y = z % n;
-		for (auto& d : dirs)
+		for (int i = 0; i < 4; i++)
 		{
-			int dx = d[0] + x, dy = d[1] + y;
+			int dx = dirs[i][0] + x, dy = dirs[i][1] + y;
 			if (dx < 0 || dx >= n || dy < 0 || dy >= n) continue;
 			int dz = dx * n + dy;
 			int tile = state[dz];
@@ -128,7 +138,11 @@ bool solve(std::vector<int>& grid, int n, int type = 0)
 			std::swap(next[z], next[dz]);
 			//int ch = heuristic(next, pos, n, type);
 			int ch = updateManhattan(h, tile, dz, z, pos, n);
-			pq.emplace(g + ch + 1, g + 1, next, dz, ch);
+			if (i == 0) move += "U";
+			else if (i == 1) move += "D";
+			else if (i == 2) move += "L";
+			else if (i == 3) move += "R";
+			pq.emplace(g + ch + 1, g + 1, next, dz, ch, move);
 		}
 	}
 	return false;
@@ -174,11 +188,8 @@ int main()
 		}
 	};
 	if (check())
-	{
 		solve(grid, n, 1);
-		std::cout << "YES" << std::endl;
-	}
-	else std::cout << "NO" << std::endl;
+	else std::cout << "The case is unsolvable" << std::endl;
 
 	auto end = std::chrono::high_resolution_clock::now();
 	double duration = (double)(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
