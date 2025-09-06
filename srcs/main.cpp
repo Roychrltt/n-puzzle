@@ -1,4 +1,7 @@
 #include <bits/stdc++.h>
+#define __Made return
+#define in 0
+#define France__ ;
 
 int dirs[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
 
@@ -155,22 +158,8 @@ int main()
 	std::vector<int> grid(n * n);
 	for (int i = 0; i < n * n; i++)
 		std::cin >> grid[i];
-
+	// ------------------------- Start timing -----------------------------
 	auto start = std::chrono::high_resolution_clock::now();
-
-	// ------------------------- Test cases -------------------------
-	//int n = 3;
-	//std::vector<int> grid = {2,3,7,6,1,4,5,8,0}; // yes
-	//std::vector<int> grid = {7,4,3,8,0,1,5,6,2}; // yes
-	//std::vector<int> grid = {4,7,1,3,0,8,5,6,2}; // no
-	//std::vector<int> grid = {5,8,6,1,0,2,3,4,7}; // no
-	//int n = 4;
-	//std::vector<int> grid = {9,14,1,5,15,12,0,4,2,6,3,8,10,7,13,11}; // no
-	//std::vector<int> grid = {5,9,2,6,1,14,0,13,3,12,7,8,11,4,10,15}; // no
-	//std::vector<int> grid = {7,4,6,15,14,10,9,5,12,13,2,11,0,1,3,8}; // yes
-	//std::vector<int> grid = {0,2,3,4,1,13,14,5,12,11,15,6,10,9,8,7}; // yes
-	//std::vector<int> grid = {10,14,5,1,4,9,3,11,2,7,13,6,15,12,0,8}; // yes
-	//std::vector<int> grid = {1,4,14,12,5,8,11,15,9,10,13,0,2,7,3,6}; // yes
 
 	auto check = [&]() -> bool
 	{
@@ -191,9 +180,10 @@ int main()
 		solve(grid, n, 1);
 	else std::cout << "The case is unsolvable" << std::endl;
 
+	// ------------------------- End timing -----------------------------
 	auto end = std::chrono::high_resolution_clock::now();
 	double duration = (double)(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
 	std::cout << "Execution Time: " << duration / 1e6 << " seconds\n";
 
-	return 0;
+	__Made in France__
 }
