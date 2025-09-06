@@ -1,9 +1,26 @@
 #include <bits/stdc++.h>
+#include <cstdlib>
 #define __Made return
 #define in 0
 #define France__ ;
 
+# define RED "\033[31m"
+# define GREEN "\033[32m"
+# define YELLOW "\033[33m"
+# define BLUE "\033[34m"
+# define MAGENTA "\033[35m"
+# define CYAN "\033[36m"
+# define GRAY "\033[90m"
+# define BOLD "\033[1m"
+# define UNDER "\033[4m"
+# define BLINK "\033[5m"
+# define ERASE = "\033[2K\r"
+# define RESET "\033[0m"
+
 int dirs[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+int heuristic = 0, solver = 0;
+std::vector<int> goal;
+bool verbose = false;
 
 static std::vector<int> makeGoal(int n)
 {
@@ -34,67 +51,73 @@ static std::vector<int> makeGoal(int n)
 
 static int manhattan(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n)
 {
-	int cnt = 0;
+	int dist = 0;
 	for (int i = 0; i < n * n; i++)
-		cnt += std::abs(i / n - pos[state[i]].first) + std::abs(i % n - pos[state[i]].second);
-	return cnt;
+		dist += std::abs(i / n - pos[state[i]].first) + std::abs(i % n - pos[state[i]].second);
+	return dist;
 }
 
-/*static int linearConflict(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n)
+static int linearConflict(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n)
 {
 	int dist = manhattan(state, pos, n);
 
-	 for (int r = 0; r < n; r++) {
-        for (int i = 0; i < n; i++) {
-            int idx1 = r * n + i;
-            int val1 = state[idx1];
-            if (val1 == 0 || pos[val1].first != r) continue;
-            for (int j = i + 1; j < n; j++) {
-                int idx2 = r * n + j;
-                int val2 = state[idx2];
-                if (val2 == 0 || pos[val2].first != r) continue;
-                if (pos[val1].second > pos[val2].second) dist += 2;
-            }
-        }
-    }
+	for (int r = 0; r < n; r++)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			int idx1 = r * n + i;
+			int val1 = state[idx1];
+			if (val1 == 0 || pos[val1].first != r) continue;
+			for (int j = i + 1; j < n; j++)
+			{
+				int idx2 = r * n + j;
+				int val2 = state[idx2];
+				if (val2 == 0 || pos[val2].first != r) continue;
+				if (pos[val1].second > pos[val2].second) dist += 2;
+			}
+		}
+	}
 
-    for (int c = 0; c < n; c++) {
-        for (int i = 0; i < n; i++) {
-            int idx1 = i * n + c;
-            int val1 = state[idx1];
-            if (val1 == 0 || pos[val1].second != c) continue;
-            for (int j = i + 1; j < n; j++) {
-                int idx2 = j * n + c;
-                int val2 = state[idx2];
-                if (val2 == 0 || pos[val2].second != c) continue;
-                if (pos[val1].first > pos[val2].first) dist += 2;
-            }
-        }
-    }
+	for (int c = 0; c < n; c++)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			int idx1 = i * n + c;
+			int val1 = state[idx1];
+			if (val1 == 0 || pos[val1].second != c) continue;
+			for (int j = i + 1; j < n; j++)
+			{
+				int idx2 = j * n + c;
+				int val2 = state[idx2];
+				if (val2 == 0 || pos[val2].second != c) continue;
+				if (pos[val1].first > pos[val2].first) dist += 2;
+			}
+		}
+	}
 	return dist;
-}*/
-
-int updateManhattan(int oldH, int tile, int oldPos, int newPos, const std::vector<std::pair<int,int>>& pos, int n) {
-    int ox = oldPos / n, oy = oldPos % n;
-    int nx = newPos / n, ny = newPos % n;
-    int goalx = pos[tile].first, goaly = pos[tile].second;
-
-    oldH -= abs(ox - goalx) + abs(oy - goaly);
-    oldH += abs(nx - goalx) + abs(ny - goaly);
-    return oldH;
 }
 
-static int heuristic(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n, int type = 0)
+static int hamming(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n)
 {
-	if (type == 0) return manhattan(state, pos, n);
-	else if (type == 1) return manhattan(state, pos, n);
-	else if (type == 2) return manhattan(state, pos, n);
+	(void)pos;
+	int dist = 0;
+
+	for (int i = 0; i < n * n; i++)
+		if (state[i] != 0 && state[i] != goal[i]) dist++;
+	return dist;
+}
+
+static int heuristicFunction(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n)
+{
+	if (heuristic == 0) return manhattan(state, pos, n);
+	else if (heuristic == 1) return linearConflict(state, pos, n);
+	else if (heuristic == 2) return hamming(state, pos, n);
 	return manhattan(state, pos, n);
 }
 
-bool solve(std::vector<int>& grid, int n, int type = 0)
+bool solve(std::vector<int>& grid, int n)
 {
-	std::vector<int> goal = makeGoal(n);
+	goal = makeGoal(n);
 	std::vector<std::pair<int, int>> pos(n * n);
 	for (int i = 0; i < n * n; i++)
 		pos[goal[i]] = {i / n, i % n};
@@ -103,7 +126,7 @@ bool solve(std::vector<int>& grid, int n, int type = 0)
 	std::priority_queue<Node, std::vector<Node>, std::greater<Node>> pq;
 	std::unordered_set<unsigned long long int> vis;
 
-	int h = heuristic(grid, pos, n, type);
+	int h = heuristicFunction(grid, pos, n);
 	int zero = (int)(std::find(grid.begin(), grid.end(), 0) - grid.begin());
 	pq.push({h, 0, grid, zero, h, ""});
 
@@ -117,10 +140,10 @@ bool solve(std::vector<int>& grid, int n, int type = 0)
 
 		if (state == goal)
 		{
-			std::cout << "Time complexity: " << cnt << " states selected in total" << std::endl;
-			std::cout << "Size complexity: at most " << mx << " states ever represented in memory at the same time" << std::endl;
-			std::cout << "Number of moves to achieve the final state: " << move.size() << std::endl;
-			std::cout << "Solution: " << move << std::endl;
+			std::cout << MAGENTA << BOLD << "Time complexity: " << UNDER << cnt << RESET << MAGENTA << " states selected in total" << std::endl;
+			std::cout << MAGENTA << BOLD << "Size complexity: " << RESET << MAGENTA << "at most " << BOLD << UNDER << mx << RESET << MAGENTA << " states ever represented in memory at the same time" << std::endl;
+			std::cout << MAGENTA << BOLD << "Number of moves to achieve the final state: " << UNDER << move.size() << RESET << std::endl;
+			std::cout << MAGENTA << BOLD << "Solution: " << RESET << MAGENTA << move << RESET << std::endl;
 			return true;
 		}
 
@@ -139,25 +162,145 @@ bool solve(std::vector<int>& grid, int n, int type = 0)
 			if (tile == 0) continue;
 			std::vector<int> next = state;
 			std::swap(next[z], next[dz]);
-			//int ch = heuristic(next, pos, n, type);
-			int ch = updateManhattan(h, tile, dz, z, pos, n);
+			int curh = heuristicFunction(next, pos, n);
 			if (i == 0) move += "U";
 			else if (i == 1) move += "D";
 			else if (i == 2) move += "L";
-			else if (i == 3) move += "R";
-			pq.emplace(g + ch + 1, g + 1, next, dz, ch, move);
+			else move += "R";
+			int f;
+			if (solver == 0) f = g + curh + 1;
+			else if (solver == 1) f = g + 1;
+			else f = curh + 1;
+			pq.emplace(f, g + 1, next, dz, curh, move);
 		}
 	}
 	return false;
 }
 
-int main()
+static void printUsage(void)
 {
-	int n;
-	std::cin >> n;
-	std::vector<int> grid(n * n);
-	for (int i = 0; i < n * n; i++)
-		std::cin >> grid[i];
+	std::cout << "Usage: ./n_puzzle [options]\n\n";
+    std::cout << "Options:\n";
+    std::cout << "  --filename <file>        Load puzzle from input file\n";
+    std::cout << "  --random <n>             Generate a random solvable puzzle of size n x n\n";
+    std::cout << "  --heuristic <type>       Choose heuristic function (default: manhattan)\n";
+    std::cout << "                           Options: manhattan, linear_conflict, hamming\n";
+    std::cout << "  --solver <type>          Choose search algorithm (default: a_star)\n";
+    std::cout << "                           Options: a_star, greedy, uniform_cost\n";
+    std::cout << "  --verbose                Print all puzzle states during solving\n";
+    std::cout << "  --help, -h               Show this help message and exit\n";
+    std::cout << "\nExamples:\n";
+    std::cout << " ./n-puzzle --filename puzzle.txt --heuristic linear_conflict --solver greedy\n";
+    std::cout << " ./n-puzzle --random 3 --heuristic manhattan --solver uniform_cost\n";
+}
+
+void readFile(const std::string &filename, int &n, std::vector<int> &grid) {
+    std::ifstream file(filename);
+    if (!file.is_open())
+	{
+		std::cerr << "Error: input file open failure" << std::endl;
+		exit(1);
+	}
+
+    std::string line;
+    while (std::getline(file, line))
+	{
+		std::cout << line << std::endl;
+        if (!line.empty() && line[0] != '#') break;
+	}
+
+    n = std::stoi(line);
+
+	while (std::getline(file, line))
+    {
+		std::cout << line << std::endl;
+        std::stringstream ss(line);
+        int val;
+        while (ss >> val) grid.push_back(val);
+    }
+}
+
+void generateRandomPuzzle(int n, std::vector<int> &grid)
+{
+    std::string command = "python case-gen.py " + std::to_string(n);
+    FILE* pipe = popen(command.c_str(), "r");
+    if (!pipe)
+	{
+		std::cerr << "Error: popen failure" << std::endl;
+		exit(1);
+	}
+
+	int count = 0;
+    char buffer[128];
+    std::string line;
+
+    while (fgets(buffer, sizeof(buffer), pipe))
+	{
+        line = buffer;
+		std::cout << line;
+		if (!line.empty() && line[0] == '#') continue;
+        std::stringstream ss(line);
+        int val;
+        while (ss >> val)
+			if (count++ > 0) grid.push_back(val);
+    }
+    pclose(pipe);
+}
+
+int main(int ac, char** av)
+{
+	if (ac < 2)
+	{
+		printUsage();
+		return 0;
+	}
+	std::vector<std::string> args(av + 1, av + ac);
+	std::string inputfile = "";
+	int n = -1;
+	std::vector<int> grid(0);
+
+	for (size_t i = 0; i < args.size(); i++)
+	{
+		if (args[i] == "--filename" && i + 1 < args.size()) inputfile = args[++i];
+        else if (args[i] == "--random" && i + 1 < args.size()) n = std::stoi(args[++i]);
+        else if (args[i] == "--heuristic" && i + 1 < args.size())
+		{
+			std::string h = args[++i];
+            if (h == "manhattan") heuristic = 0;
+            else if (h == "linear_conflict") heuristic = 1;
+            else if (h == "hamming") heuristic = 2;
+            else
+			{
+                std::cerr << "Unknown heuristic: " << h << std::endl;
+                return 1;
+			}
+		}
+        else if (args[i] == "--solver" && i + 1 < args.size())
+		{
+			std::string s = args[++i];
+            if (s == "a_star") solver = 0;
+            else if (s == "uniform_cost") solver = 1;
+            else if (s == "greedy") solver = 2;
+            else
+			{
+                std::cerr << "Unknown solver: " << s << std::endl;
+                return 1;
+            }
+		}
+		else if (args[i] == "--help" || args[i] == "-h")
+		{
+            std::cout << "Usage: ./program [--filename <file>] [--random <n>] [--heuristic <type>] [--solver <type>]\n";
+            return 0;
+        }
+	}
+
+	if (inputfile != "") readFile(inputfile, n, grid);
+	else if (n < 3)
+	{
+		std::cerr << "Error: Grid size should be at least 3x3" << std::endl;
+		return 0;
+	}
+	else generateRandomPuzzle(n, grid);
 	// ------------------------- Start timing -----------------------------
 	auto start = std::chrono::high_resolution_clock::now();
 
@@ -177,8 +320,8 @@ int main()
 		}
 	};
 	if (check())
-		solve(grid, n, 1);
-	else std::cout << "The case is unsolvable" << std::endl;
+		solve(grid, n);
+	else std::cout << RED << "The puzzle is unsolvable" << RESET << std::endl;
 
 	// ------------------------- End timing -----------------------------
 	auto end = std::chrono::high_resolution_clock::now();
