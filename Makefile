@@ -4,9 +4,11 @@ CPP = g++ -std=c++20
 
 CFLAGS = -Wall -Werror -Wextra -Wno-shadow -Wconversion
 
+INC = -I ./include/.
+
 SRC_DIR = ./srcs/
 	  
-SRC_FILES = main.cpp
+SRC_FILES = main.cpp print.cpp input.cpp heuristics.cpp
 
 SRC = $(addprefix $(SRC_DIR), $(SRC_FILES))
 
@@ -24,7 +26,7 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	if [ ! -f $(NAME) ] || [ `find $(OBJ) -newer $(NAME) | wc -l` -ne 0 ]; then \
-	$(CPP) $(CFLAGS) $(OBJ) -o $(NAME); \
+	$(CPP) $(CFLAGS) $(INC) $(OBJ) -o $(NAME); \
 		printf "$(ERASE)$(GREEN)👷 Program$(RESET) $(CYAN)$(BOLD)$(NAME)$(RESET) $(GREEN)created! 👷\n$(RESET)"; \
 	else \
 		printf "$(ERASE)$(YELLOW)No relink needed for$(RESET) $(CYAN)$(BOLD)$(NAME)\n$(RESET)"; \
