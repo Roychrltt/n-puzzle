@@ -47,9 +47,21 @@ static std::string encode(const std::vector<int>& state)
 	return s;
 }
 
+static int	count(const std::vector<int>& grid)
+{
+	size_t n = grid.size();
+	int cnt = 0;
+	for (size_t i = 0; i < n - 1; i++)
+		for (size_t j = i + 1; j < n; j++)
+			if (grid[i] < grid[j]) cnt++;
+
+	return cnt;
+}
+
 bool solve(std::vector<int>& grid, int n)
 {
 	goal = makeGoal(n);
+	if (count(grid) % 2 != count(goal) % 2) return false;
 	std::vector<std::pair<int, int>> pos(n * n);
 	for (int i = 0; i < n * n; i++)
 		pos[goal[i]] = {i / n, i % n};
@@ -167,32 +179,9 @@ int main(int ac, char** av)
 	else generateRandomPuzzle(n, grid);
 	// ------------------------- Start timing -----------------------------
 	auto start = std::chrono::high_resolution_clock::now();
-	auto check = [&]() -> bool
-	{
-		int cnt = 0;
-		for (int i = 0; i < n * n; i++)
-			for (int j = i + 1; j < n * n; j++)
-				if (grid[i] && grid[j] && grid[i] > grid[j]) cnt++;
 
-		if (n & 1) return (cnt & 1);
-		else
-		{
-			int z = (int)(std::find(grid.begin(), grid.end(), 0) - grid.begin());
-			int r = n - (z / n);
-			return ((cnt + r) % 2 == 1);
-		}
-	};
-
-	if (n == 3)
-	{
-		if (check()) solve(grid, n);
-		else std::cout << RED << "The puzzle is unsolvable" << RESET << std::endl;
-	}
-	else
-	{
-		if (!solve(grid, n))
-			std::cout << RED << "The puzzle is unsolvable" << RESET << std::endl;
-	}
+	if (!solve(grid, n))
+		std::cout << RED << "The puzzle is unsolvable" << RESET << std::endl;
 
 	// ------------------------- End timing -----------------------------
 	auto end = std::chrono::high_resolution_clock::now();
