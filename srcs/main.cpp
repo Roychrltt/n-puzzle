@@ -34,10 +34,10 @@ static std::vector<int> makeGoal(int n)
 
 static int heuristicFunction(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n, const std::vector<int>& goal)
 {
-	if (heuristic == 0) return manhattan(state, pos, n);
-	else if (heuristic == 1) return linearConflict(state, pos, n);
+	if (heuristic == 0) return linearConflict(state, pos, n);
+	else if (heuristic == 1) return manhattan(state, pos, n);
 	else if (heuristic == 2) return hamming(state, pos, n, goal);
-	return manhattan(state, pos, n);
+	return linearConflict(state, pos, n);
 }
 
 static std::string encode(const std::vector<int>& state)
@@ -47,21 +47,37 @@ static std::string encode(const std::vector<int>& state)
 	return s;
 }
 
-static int	count(const std::vector<int>& grid)
+int	parityPermutation(const std::vector<int>& grid)
 {
-	size_t n = grid.size();
-	int cnt = 0;
-	for (size_t i = 0; i < n - 1; i++)
-		for (size_t j = i + 1; j < n; j++)
-			if (grid[i] < grid[j]) cnt++;
+	std::vector<bool> vis(grid.size(), false);
+	int ok = 0;
+	for (int i = 0; i < static_cast<int>(grid.size()); i++)
+	{
+		if (vis[i]) continue;
+		vis[i] = true;
+		int j = grid[i];
+		while (j != i)
+		{
+			vis[j] = true;
+			j = grid[j];
+			ok ^= 1;
+		}
+	}
+	return ok;
+}
 
-	return cnt;
+bool	check(const std::vector<int>& grid, const std::vector<int>& goal, int n)
+{
+	int idx = static_cast<int>(std::find(grid.begin(), grid.end(), 0) - grid.begin());
+	int py = idx / n, px = idx % n;
+	int parityZero = (static_cast<int>(grid.size()) ^ py ^ px ^ 1) & 1;
+	return parityZero == (parityPermutation(grid) ^ parityPermutation(goal));
 }
 
 bool solve(std::vector<int>& grid, int n)
 {
 	goal = makeGoal(n);
-	if (count(grid) % 2 != count(goal) % 2) return false;
+	if (!check(grid, goal, n)) return false;
 	std::vector<std::pair<int, int>> pos(n * n);
 	for (int i = 0; i < n * n; i++)
 		pos[goal[i]] = {i / n, i % n};
