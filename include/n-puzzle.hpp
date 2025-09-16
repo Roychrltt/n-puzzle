@@ -15,6 +15,7 @@
 # define BLINK "\033[5m"
 # define ERASE = "\033[2K\r"
 # define RESET "\033[0m"
+# define MAX_SPACE 10000000ull
 
 // ---------------------------- print --------------------------
 void	printUsage(void);
