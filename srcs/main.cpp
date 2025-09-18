@@ -104,9 +104,6 @@ bool solve(std::vector<int>& grid, int n)
 			return true;
 		}
 
-		std::string s = encode(state);
-		if (vis.find(s) != vis.end()) continue;
-		vis.insert(s);
 
 		int x = z / n, y = z % n;
 		for (int i = 0; i < 4; i++)
@@ -118,6 +115,9 @@ bool solve(std::vector<int>& grid, int n)
 			if (tile == 0) continue;
 			std::vector<int> next = state;
 			std::swap(next[z], next[dz]);
+			std::string s = encode(next);
+			if (vis.find(s) != vis.end()) continue;
+			vis.insert(s);
 			int curh = heuristicFunction(next, pos, n, goal);
 			int f;
 			if (solver == 0) f = g + curh + 1;
