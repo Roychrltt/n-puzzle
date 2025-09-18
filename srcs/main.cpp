@@ -95,6 +95,11 @@ bool solve(std::vector<int>& grid, int n)
 	{
 		cnt++;
 		mx = std::max(mx, (unsigned long long int)pq.size());
+		if (mx == std::numeric_limits<unsigned long long int>::max() || pq.size() > MAX_SPACE || vis.size() > MAX_SPACE)
+		{
+			std::cerr << RED << "Error: programm occupying too much space, aborting..." << RESET << std::endl;
+			return false;
+		}
 		auto [f, g, state, z, h, move] = pq.top();
 		pq.pop();
 
@@ -189,10 +194,20 @@ int main(int ac, char** av)
 	if (inputfile != "") readFile(inputfile, n, grid);
 	else if (n < 3)
 	{
-		std::cerr << "Error: Grid size should be at least 3x3" << std::endl;
+		std::cerr << "Error: puzzle size should be at least 3x3" << std::endl;
+		return 0;
+	}
+	else if (n > 17)
+	{
+		std::cerr << "Error: puzzle size too large to solve feasibly" << std::endl;
 		return 0;
 	}
 	else generateRandomPuzzle(n, grid);
+	if (grid.size() != n * n)
+	{
+		std::cerr << RED << "Invalid input file: puzzle is not complete." << std::endl;
+		return 0;
+	}
 	// ------------------------- Start timing -----------------------------
 	auto start = std::chrono::high_resolution_clock::now();
 

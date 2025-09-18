@@ -9,20 +9,25 @@ void	readFile(const std::string &filename, int &n, std::vector<int> &grid) {
 	}
 
 	std::string line;
-	while (std::getline(file, line))
-	{
-		std::cout << line << std::endl;
-		if (!line.empty() && line[0] != '#') break;
-	}
-
-	n = std::stoi(line);
+	bool nRead = false;
 
 	while (std::getline(file, line))
 	{
 		std::cout << line << std::endl;
+		size_t pos = line.find('#');
+		if (pos != std::string::npos) line = line.substr(0, pos);
+		if (line.empty()) continue;
 		std::stringstream ss(line);
-		int val;
-		while (ss >> val) grid.push_back(val);
+		if (!nRead)
+		{
+			ss >> n;
+			nRead = true;
+		}
+		else
+		{
+			int val;
+			while (ss >> val) grid.push_back(val);
+		}
 	}
 }
 
