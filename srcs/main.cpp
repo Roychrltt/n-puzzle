@@ -163,8 +163,8 @@ int main(int ac, char** av)
 		else if (args[i] == "--heuristic" && i + 1 < args.size())
 		{
 			std::string h = args[++i];
-			if (h == "manhattan") heuristic = 0;
-			else if (h == "linear_conflict") heuristic = 1;
+			if (h == "linear_conflict") heuristic = 0;
+			else if (h == "manhattan") heuristic = 1;
 			else if (h == "hamming") heuristic = 2;
 			else
 			{
@@ -175,7 +175,7 @@ int main(int ac, char** av)
 		else if (args[i] == "--solver" && i + 1 < args.size())
 		{
 			std::string s = args[++i];
-			if (s == "a_star") solver = 0;
+			if (s == "linear_conflict") solver = 0;
 			else if (s == "uniform_cost") solver = 1;
 			else if (s == "greedy") solver = 2;
 			else
