@@ -1,9 +1,8 @@
 #include "../include/n-puzzle.hpp"
 
 int dirs[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-int heuristic = 0, solver = 0;
+int heuristic = 0, solver = 0, verbose = 0;
 std::vector<int> goal;
-bool verbose = false;
 
 static std::vector<int> makeGoal(int n)
 {
@@ -105,10 +104,10 @@ bool solve(std::vector<int>& grid, int n)
 
 		if (state == goal)
 		{
+			if (verbose) printMoves(grid, move);
 			printSolution(cnt, mx, move);
 			return true;
 		}
-
 
 		int x = z / n, y = z % n;
 		for (int i = 0; i < 4; i++)
@@ -189,6 +188,7 @@ int main(int ac, char** av)
 			std::cout << "Usage: ./program [--filename <file>] [--random <n>] [--heuristic <type>] [--solver <type>]\n";
 			return 0;
 		}
+		else if (args[i] == "--verbose") verbose = 1;
 	}
 
 	if (inputfile != "") readFile(inputfile, n, grid);

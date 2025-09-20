@@ -16,6 +16,55 @@ void	printUsage(void)
 	std::cout << " ./n-puzzle --random 3 --heuristic manhattan --solver uniform_cost\n";
 }
 
+void printGrid(const std::vector<int>& grid, size_t n)
+{
+	for (size_t i = 0; i < n; i++)
+	{
+		for (size_t j = 0; j < n; j++)
+		{
+			std::cout << grid[i * n + j] << " ";
+		}
+		std::cout << std::endl;
+	}
+}
+
+void	printMoves(std::vector<int>& grid, const std::string& move)
+{
+	size_t n = static_cast<size_t>(std::sqrt(grid.size()));
+	printGrid(grid, n);
+	size_t idx = 0;
+	while (idx < grid.size() && grid[idx] != 0)
+		idx++;
+	for (auto& c : move)
+	{
+		if (c == 'U')
+		{
+			std::cout << "\n\t\u2191\n" << std::endl;
+			std::swap(grid[idx], grid[idx - n]);
+			idx -= n;
+		}
+		else if (c == 'D')
+		{
+			std::cout << "\n\t\u2193\n" << std::endl;
+			std::swap(grid[idx], grid[idx + n]);
+			idx += n;
+		}
+		else if (c == 'L')
+		{
+			std::cout << "\n\t\u2190\n" << std::endl;
+			std::swap(grid[idx], grid[idx - 1]);
+			idx--;
+		}
+		else if (c == 'R')
+		{
+			std::cout << "\n\t\u2192\n" << std::endl;
+			std::swap(grid[idx], grid[idx + 1]);
+			idx++;
+		}
+		printGrid(grid, n);
+	}
+}
+
 void	printSolution(unsigned long long int cnt, unsigned long long int mx, const std::string& move)
 {
 	std::cout << MAGENTA << BOLD << "Time complexity: " << UNDER << cnt << RESET << MAGENTA << " states selected in total" << std::endl;

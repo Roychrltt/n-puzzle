@@ -19,6 +19,8 @@
 
 // ---------------------------- print --------------------------
 void	printUsage(void);
+void	printGrid(const std::vector<int>& grid, size_t n);
+void	printMoves(std::vector<int>& grid, const std::string& move);
 void	printSolution(unsigned long long int cnt, unsigned long long int mx, const std::string& move);
 
 // ---------------------------- input --------------------------
