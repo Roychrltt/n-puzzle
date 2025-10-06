@@ -10,6 +10,7 @@ void	printUsage(void)
 	std::cout << "                           Options: manhattan, linear_conflict, hamming\n";
 	std::cout << "  --solver <type>          Choose search algorithm (default: a_star)\n";
 	std::cout << "                           Options: a_star, greedy, uniform_cost\n";
+	std::cout << "  --verbose                Print each step of the solution\n";
 	std::cout << "  --help, -h               Show this help message and exit\n";
 	std::cout << "\nExamples:\n";
 	std::cout << " ./n-puzzle --filename puzzle.txt --heuristic linear_conflict --solver greedy\n";
