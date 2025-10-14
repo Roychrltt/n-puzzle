@@ -29,8 +29,9 @@ void printGrid(const std::vector<int>& grid, size_t n)
 	}
 }
 
-void	printMoves(std::vector<int>& grid, const std::string& move)
+void	printMoves(const std::vector<int>& originGrid, const std::string& move)
 {
+	std::vector<int> grid = originGrid;
 	size_t n = static_cast<size_t>(std::sqrt(grid.size()));
 	printGrid(grid, n);
 	size_t idx = 0;

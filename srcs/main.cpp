@@ -1,37 +1,11 @@
 #include "../include/n-puzzle.hpp"
 
 int dirs[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-int heuristic = 0, solver = 0, verbose = 0;
+int verbose = 0;
 std::vector<int> goal;
+bool benchmark = false;
 
-static std::vector<int> makeGoal(int n)
-{
-	std::vector<int> goal(n * n);
-	int top = 0, left = 0, bottom = n - 1, right = n - 1;
-	int val = 1;
-	while (top <= bottom && left <= right)
-	{
-		for (int i = left; i <= right; i++) goal[top * n + i] = val++;
-		top++;
-		for (int i = top; i <= bottom; i++) goal[i * n + right] = val++;
-		right--;
-		if (top <= bottom)
-		{
-			for (int i = right; i >= left; i--) goal[bottom * n + i] = val++;
-			bottom--;
-		}
-		if (left <= right)
-		{
-			for (int i = bottom; i >= top; i--) goal[i * n + left] = val++;
-			left++;
-		}
-	}
-	if (n & 1) goal[n / 2 * n + n / 2] = 0;
-	else goal[n / 2 * n + n / 2 - 1] = 0;
-	return goal;
-}
-
-static int heuristicFunction(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n, const std::vector<int>& goal)
+static int heuristicFunction(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n, const std::vector<int>& goal, int heuristic)
 {
 	if (heuristic == 0) return linearConflict(state, pos, n);
 	else if (heuristic == 1) return manhattan(state, pos, n);
@@ -39,44 +13,12 @@ static int heuristicFunction(const std::vector<int>& state, const std::vector<st
 	return linearConflict(state, pos, n);
 }
 
-static std::string encode(const std::vector<int>& state)
+static std::vector<unsigned long long int>	solve(const std::vector<int>& grid, int n, int heuristic, int solver)
 {
-	std::string s = "";
-	for (int i : state) s += std::to_string(i) + "$";
-	return s;
-}
+	auto start = std::chrono::high_resolution_clock::now();
 
-int	parityPermutation(const std::vector<int>& grid)
-{
-	std::vector<bool> vis(grid.size(), false);
-	int ok = 0;
-	for (int i = 0; i < static_cast<int>(grid.size()); i++)
-	{
-		if (vis[i]) continue;
-		vis[i] = true;
-		int j = grid[i];
-		while (j != i)
-		{
-			vis[j] = true;
-			j = grid[j];
-			ok ^= 1;
-		}
-	}
-	return ok;
-}
-
-bool	check(const std::vector<int>& grid, const std::vector<int>& goal, int n)
-{
-	int idx = static_cast<int>(std::find(grid.begin(), grid.end(), 0) - grid.begin());
-	int py = idx / n, px = idx % n;
-	int parityZero = (static_cast<int>(grid.size()) ^ py ^ px ^ 1) & 1;
-	return parityZero == (parityPermutation(grid) ^ parityPermutation(goal));
-}
-
-bool solve(std::vector<int>& grid, int n)
-{
-	goal = makeGoal(n);
-	if (!check(grid, goal, n)) return false;
+	bool flag = false;
+	std::string res = "";
 	std::vector<std::pair<int, int>> pos(n * n);
 	for (int i = 0; i < n * n; i++)
 		pos[goal[i]] = {i / n, i % n};
@@ -85,7 +27,7 @@ bool solve(std::vector<int>& grid, int n)
 	std::priority_queue<Node, std::vector<Node>, std::greater<Node>> pq;
 	std::unordered_set<std::string> vis;
 
-	int h = heuristicFunction(grid, pos, n, goal);
+	int h = heuristicFunction(grid, pos, n, goal, heuristic);
 	int zero = (int)(std::find(grid.begin(), grid.end(), 0) - grid.begin());
 	pq.push({h, 0, grid, zero, h, ""});
 
@@ -97,7 +39,7 @@ bool solve(std::vector<int>& grid, int n)
 		if (mx == std::numeric_limits<unsigned long long int>::max() || pq.size() > MAX_SPACE || vis.size() > MAX_SPACE)
 		{
 			std::cerr << RED << "Error: programm occupying too much space, aborting..." << RESET << std::endl;
-			return false;
+			return {};
 		}
 		auto [f, g, state, z, h, move] = pq.top();
 		pq.pop();
@@ -106,7 +48,9 @@ bool solve(std::vector<int>& grid, int n)
 		{
 			if (verbose) printMoves(grid, move);
 			printSolution(cnt, mx, move);
-			return true;
+			flag = true;
+			res = std::move(move);
+			break;
 		}
 
 		int x = z / n, y = z % n;
@@ -122,7 +66,7 @@ bool solve(std::vector<int>& grid, int n)
 			std::string s = encode(next);
 			if (vis.find(s) != vis.end()) continue;
 			vis.insert(s);
-			int curh = heuristicFunction(next, pos, n, goal);
+			int curh = heuristicFunction(next, pos, n, goal, heuristic);
 			int f;
 			if (solver == 0) f = g + curh + 1;
 			else if (solver == 1) f = g + 1;
@@ -137,7 +81,38 @@ bool solve(std::vector<int>& grid, int n)
 				pq.emplace(f, g + 1, next, dz, curh, move + "R");
 		}
 	}
-	return false;
+	auto end = std::chrono::high_resolution_clock::now();
+	double duration = (double)(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
+	std::cout << "Execution Time: " << duration / 1e6 << " seconds\n";
+	if (flag) return {cnt, mx, res.size()};
+	return {};
+}
+
+static void runBenchmark(const std::vector<int>& grid, int n)
+{
+	int cnt = HEURISTIC_NUM * SOLVER_NUM;
+	std::vector<unsigned long long int> time(cnt, -1), space(cnt, -1), sol(cnt, -1);
+	std::vector<double> speed(cnt, -1);
+	for (int i = 0; i < HEURISTIC_NUM; i++)
+	{
+		for (int j = 0; j < SOLVER_NUM; j++)
+		{
+			auto start = std::chrono::high_resolution_clock::now();
+			std::vector<unsigned long long int> tmp = solve(grid, n, i, j);
+			auto end = std::chrono::high_resolution_clock::now();
+			
+			auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+			int x = i * HEURISTIC_NUM + j;
+			if (!tmp.empty())
+			{
+				time[x] = tmp[0];
+				space[x] = tmp[1];
+				sol[x] = tmp[2];
+			}
+			speed[x] = static_cast<double>(duration) / 1e6;
+		}
+	}
+	std::cout << GREEN << "\nComprehensive Benchmark Results:" << std::endl;
 }
 
 int main(int ac, char** av)
@@ -152,7 +127,7 @@ int main(int ac, char** av)
 	}
 	std::vector<std::string> args(av + 1, av + ac);
 	std::string inputfile = "";
-	int n = -1;
+	int n = -1, solver = 0, heuristic = 0;
 	std::vector<int> grid(0);
 
 	for (size_t i = 0; i < args.size(); i++)
@@ -174,7 +149,7 @@ int main(int ac, char** av)
 		else if (args[i] == "--solver" && i + 1 < args.size())
 		{
 			std::string s = args[++i];
-			if (s == "linear_conflict") solver = 0;
+			if (s == "a_star") solver = 0;
 			else if (s == "uniform_cost") solver = 1;
 			else if (s == "greedy") solver = 2;
 			else
@@ -189,6 +164,7 @@ int main(int ac, char** av)
 			return 0;
 		}
 		else if (args[i] == "--verbose") verbose = 1;
+		else if (args[i] == "--benchmark") benchmark = true;
 	}
 
 	if (inputfile != "") readFile(inputfile, n, grid);
@@ -208,16 +184,24 @@ int main(int ac, char** av)
 		std::cerr << RED << "Invalid input file: puzzle is not complete." << std::endl;
 		return 0;
 	}
-	// ------------------------- Start timing -----------------------------
-	auto start = std::chrono::high_resolution_clock::now();
 
-	if (!solve(grid, n))
+	goal = makeGoal(n);
+	if (!check(grid, goal, n))
+	{
 		std::cout << RED << "The puzzle is unsolvable" << RESET << std::endl;
+		__Made in France__
 
-	// ------------------------- End timing -----------------------------
-	auto end = std::chrono::high_resolution_clock::now();
-	double duration = (double)(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
-	std::cout << "Execution Time: " << duration / 1e6 << " seconds\n";
+	}
+	if (benchmark) runBenchmark(grid, n);
+	else
+	{
+		auto start = std::chrono::high_resolution_clock::now();
+		solve(grid, n, heuristic, solver);
+		auto end = std::chrono::high_resolution_clock::now();
+		
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+		std::cout << "Execution Time: " << static_cast<double>(duration) / 1e6 << " seconds\n";
+	}
 
 	__Made in France__
 }

@@ -16,11 +16,13 @@
 # define ERASE = "\033[2K\r"
 # define RESET "\033[0m"
 # define MAX_SPACE 10000000ull
+# define HEURISTIC_NUM 3
+# define SOLVER_NUM 3
 
 // ---------------------------- print --------------------------
 void	printUsage(void);
 void	printGrid(const std::vector<int>& grid, size_t n);
-void	printMoves(std::vector<int>& grid, const std::string& move);
+void	printMoves(const std::vector<int>& originGrid, const std::string& move);
 void	printSolution(unsigned long long int cnt, unsigned long long int mx, const std::string& move);
 
 // ---------------------------- input --------------------------
@@ -31,3 +33,9 @@ void	generateRandomPuzzle(int n, std::vector<int> &grid);
 int		manhattan(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n);
 int		linearConflict(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n);
 int		hamming(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n, const std::vector<int>& goal);
+
+// ---------------------------- helper --------------------------
+std::vector<int>	makeGoal(int n);
+std::string			encode(const std::vector<int>& state);
+int					parityPermutation(const std::vector<int>& grid);
+bool				check(const std::vector<int>& grid, const std::vector<int>& goal, int n);
