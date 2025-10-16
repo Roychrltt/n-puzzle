@@ -15,6 +15,14 @@ static int heuristicFunction(const std::vector<int>& state, const std::vector<st
 
 static std::vector<unsigned long long int>	solve(const std::vector<int>& grid, int n, int heuristic, int solver)
 {
+	std::string s1, s2;
+	if (heuristic == 1) s1 = "manhattan";
+	else if (heuristic == 2) s1 = "hamming";
+	else s1 = "manhattan with linear conflict";
+	if (solver == 1) s2 = "uniform cost";
+	else if (solver == 2) s2 = "greedy";
+	else s2 = "classic a_star";
+	std::cout << BOLD << GREEN << "\nSolving the puzzle using heuristic function " << UNDER << s1 << RESET << GREEN << BOLD << " and the " << UNDER << s2 << RESET << GREEN << BOLD << " search\n" << RESET << std::endl;
 	auto start = std::chrono::high_resolution_clock::now();
 
 	bool flag = false;
@@ -112,7 +120,10 @@ static void runBenchmark(const std::vector<int>& grid, int n)
 			speed[x] = static_cast<double>(duration) / 1e6;
 		}
 	}
-	std::cout << GREEN << "\nComprehensive Benchmark Results:" << std::endl;
+	std::cout << YELLOW << "\nComprehensive Benchmark Results:" << std::endl;
+	std::cout << "Running time:" << std::endl;
+	std::cout << "Linear conflict < manhattan < hamming" << std::endl;
+	std::cout << "Greedy < a_star < uniform cost" << std::endl;
 }
 
 int main(int ac, char** av)
