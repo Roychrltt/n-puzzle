@@ -16,7 +16,7 @@
 # define ERASE = "\033[2K\r"
 # define RESET "\033[0m"
 # define MAX_SPACE 10000000ull
-# define HEURISTIC_NUM 3
+# define HEURISTIC_NUM 5
 # define SOLVER_NUM 3
 
 // ---------------------------- print --------------------------
@@ -33,6 +33,8 @@ void	generateRandomPuzzle(int n, std::vector<int> &grid);
 int		manhattan(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n);
 int		linearConflict(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n);
 int		hamming(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n, const std::vector<int>& goal);
+int		chebyshev(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n);
+int		euclidean(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n);
 
 // ---------------------------- helper --------------------------
 std::vector<int>	makeGoal(int n);

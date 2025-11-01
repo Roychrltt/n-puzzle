@@ -9,20 +9,26 @@ static int heuristicFunction(const std::vector<int>& state, const std::vector<st
 {
 	if (heuristic == 0) return linearConflict(state, pos, n);
 	else if (heuristic == 1) return manhattan(state, pos, n);
-	else if (heuristic == 2) return hamming(state, pos, n, goal);
+	else if (heuristic == 2) return chebyshev(state, pos, n);
+	else if (heuristic == 3) return euclidean(state, pos, n);
+	else if (heuristic == 4) return hamming(state, pos, n, goal);
 	return linearConflict(state, pos, n);
 }
 
 static std::vector<unsigned long long int>	solve(const std::vector<int>& grid, int n, int heuristic, int solver)
 {
 	std::string s1, s2;
-	if (heuristic == 1) s1 = "manhattan";
-	else if (heuristic == 2) s1 = "hamming";
-	else s1 = "manhattan with linear conflict";
+	if (heuristic == 1) s1 = "manhattan distance";
+	else if (heuristic == 2) s1 = "chebyshev distance";
+	else if (heuristic == 3) s1 = "euclidean distance";
+	else if (heuristic == 4) s1 = "hamming";
+	else s1 = "manhattan distance with linear conflict";
 	if (solver == 1) s2 = "uniform cost";
 	else if (solver == 2) s2 = "greedy";
 	else s2 = "classic a_star";
-	std::cout << BOLD << GREEN << "\nSolving the puzzle using heuristic function " << UNDER << s1 << RESET << GREEN << BOLD << " and the " << UNDER << s2 << RESET << GREEN << BOLD << " search\n" << RESET << std::endl;
+
+	std::cout << BOLD << GREEN << "\nSolving the puzzle using heuristic function " << UNDER << s1 << RESET << GREEN << BOLD << " and the " << UNDER << s2 << RESET << GREEN << BOLD << " search:\n" << RESET << std::endl;
+
 	auto start = std::chrono::high_resolution_clock::now();
 
 	bool flag = false;
@@ -98,14 +104,14 @@ static std::vector<unsigned long long int>	solve(const std::vector<int>& grid, i
 
 static void runBenchmark(const std::vector<int>& grid, int n)
 {
-	int cnt = HEURISTIC_NUM * SOLVER_NUM;
+	/*int cnt = HEURISTIC_NUM * SOLVER_NUM;
 	std::vector<unsigned long long int> time(cnt, -1), space(cnt, -1), sol(cnt, -1);
-	std::vector<double> speed(cnt, -1);
-	for (int i = 0; i < HEURISTIC_NUM; i++)
+	std::vector<double> speed(cnt, -1);*/
+	for (int j = 0; j < SOLVER_NUM; j++)
 	{
-		for (int j = 0; j < SOLVER_NUM; j++)
+		for (int i = 0; i < HEURISTIC_NUM; i++)
 		{
-			auto start = std::chrono::high_resolution_clock::now();
+			/*auto start = std::chrono::high_resolution_clock::now();
 			std::vector<unsigned long long int> tmp = solve(grid, n, i, j);
 			auto end = std::chrono::high_resolution_clock::now();
 			
@@ -117,13 +123,16 @@ static void runBenchmark(const std::vector<int>& grid, int n)
 				space[x] = tmp[1];
 				sol[x] = tmp[2];
 			}
-			speed[x] = static_cast<double>(duration) / 1e6;
+			speed[x] = static_cast<double>(duration) / 1e6;*/
+			solve(grid, n, i, j);
 		}
 	}
-	std::cout << YELLOW << "\nComprehensive Benchmark Results:" << std::endl;
-	std::cout << "Running time:" << std::endl;
-	std::cout << "Linear conflict < manhattan < hamming" << std::endl;
-	std::cout << "Greedy < a_star < uniform cost" << std::endl;
+	std::cout << YELLOW << "\n📊 Comprehensive Benchmark Results (theoretical results, for reference):" << std::endl;
+	std::cout << "\n⏳ Running time:" << std::endl;
+	std::cout << "Manhattan distance with linear conflict < manhattan distance < euclidean distance < chebyshev distance < hamming" << std::endl;
+	std::cout << "Greedy < classic a_star < uniform cost" << std::endl;
+	std::cout << "\n🧭 Solution length:" << std::endl;
+	std::cout << "uniform cost < classic a_star < Greedy" << std::endl;
 }
 
 int main(int ac, char** av)

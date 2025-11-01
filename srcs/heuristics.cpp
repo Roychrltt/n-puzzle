@@ -57,3 +57,23 @@ int	hamming(const std::vector<int>& state, const std::vector<std::pair<int, int>
 		if (state[i] != 0 && state[i] != goal[i]) dist++;
 	return dist;
 }
+
+int	chebyshev(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n)
+{
+	int dist = 0;
+	for (int i = 0; i < n * n; i++)
+		dist += std::max(std::abs(i / n - pos[state[i]].first), std::abs(i % n - pos[state[i]].second));
+	return dist;
+}
+
+int	euclidean(const std::vector<int>& state, const std::vector<std::pair<int, int>>& pos, int n)
+{
+	double dist = 0;
+	for (int i = 0; i < n * n; i++)
+	{
+		int x = std::abs(i / n - pos[state[i]].first);
+		int y = std::abs(i % n - pos[state[i]].second);
+		dist += std::sqrt(x * x + y * y);
+	}
+	return static_cast<int>(dist);
+}
