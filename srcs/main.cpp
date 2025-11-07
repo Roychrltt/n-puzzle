@@ -213,15 +213,7 @@ int main(int ac, char** av)
 
 	}
 	if (benchmark) runBenchmark(grid, n);
-	else
-	{
-		auto start = std::chrono::high_resolution_clock::now();
-		solve(grid, n, heuristic, solver);
-		auto end = std::chrono::high_resolution_clock::now();
-		
-		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-		std::cout << "Execution Time: " << static_cast<double>(duration) / 1e6 << " seconds\n";
-	}
+	else solve(grid, n, heuristic, solver);
 
 	__Made in France__
 }
