@@ -26,3 +26,4 @@ A modern C++ implementation of the N-Puzzle solver using A* search with multiple
 - <bits/stdc++.h>
 
 ## Usage
+![](images/usage.png)
