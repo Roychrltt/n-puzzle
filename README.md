@@ -11,10 +11,16 @@ A modern C++ implementation of the N-Puzzle solver using A* search with multiple
   - Manhattan distance
   - Misplaced tiles
   - Linear conflict (if implemented)
-  - 
+  - chebyshev distance
+  - Euclidean distance
 
-Displays solution steps clearly
+- Displays solutions step by step
 
-Optional interactive mode to input your puzzle configuration
+- Reads puzzle from files or generates one in specified dimension
 
-Handles unsolvable puzzles gracefully
+- Handles unsolvable puzzles gracefully
+
+## Requirements
+
+- c++11 or newer
+- <bits/stdc++.h>
