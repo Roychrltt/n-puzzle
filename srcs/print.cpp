@@ -11,6 +11,8 @@ void	printUsage(void)
 	std::cout << "  --solver <type>          Choose search algorithm (default: a_star)\n";
 	std::cout << "                           Options: a_star, greedy, uniform_cost\n";
 	std::cout << "  --verbose                Print each step of the solution\n";
+	std::cout << "  --benchmark              Solve puzzle with every heuristic function and a* variant\n";
+	std::cout << "                           to have a comprehensive understanding of each method\n";
 	std::cout << "  --help, -h               Show this help message and exit\n";
 	std::cout << "\nExamples:\n";
 	std::cout << " ./n-puzzle --filename puzzle.txt --heuristic linear_conflict --solver greedy\n";
