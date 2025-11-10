@@ -137,9 +137,6 @@ static void runBenchmark(const std::vector<int>& grid, int n)
 
 int main(int ac, char** av)
 {
-	std::ios::sync_with_stdio(false);
-	std::cin.tie(0);
-	std::cout.tie(0);
 	if (ac < 2)
 	{
 		printUsage();
@@ -159,7 +156,9 @@ int main(int ac, char** av)
 			std::string h = args[++i];
 			if (h == "linear_conflict") heuristic = 0;
 			else if (h == "manhattan") heuristic = 1;
-			else if (h == "hamming") heuristic = 2;
+			else if (h == "chebyshev") heuristic = 2;
+			else if (h == "euclidean") heuristic = 3;
+			else if (h == "hamming") heuristic = 4;
 			else
 			{
 				std::cerr << "Unknown heuristic: " << h << std::endl;
