@@ -1,6 +1,6 @@
 # N-Puzzle Solver
 
-A modern C++ implementation of the N-Puzzle solver using A* search with multiple heuristics with a clean, modular design.
+A modern C++ implementation of the N-Puzzle solver using A* search with multiple heuristics.
 
 ## Features
 - Solves n-puzzle of any dimension (3 * 3, 4 * 4, or bigger)
@@ -27,3 +27,9 @@ A modern C++ implementation of the N-Puzzle solver using A* search with multiple
 
 ## Usage
 ![](images/usage.png)
+
+
+## Output examples
+![](images/4*4.png)
+![](images/5*5.png)
+![](images/6*6.png)
