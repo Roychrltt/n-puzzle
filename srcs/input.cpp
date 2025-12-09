@@ -33,7 +33,7 @@ void	readFile(const std::string &filename, int &n, std::vector<int> &grid) {
 
 void	generateRandomPuzzle(int n, std::vector<int> &grid)
 {
-	std::string command = "python case-gen.py " + std::to_string(n);
+	std::string command = "python3 case-gen.py " + std::to_string(n);
 	FILE* pipe = popen(command.c_str(), "r");
 	if (!pipe)
 	{

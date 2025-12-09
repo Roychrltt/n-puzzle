@@ -16,7 +16,7 @@ OBJ_DIR = .objs/
 
 OBJ = $(SRC:$(SRC_DIR)%.cpp=$(OBJ_DIR)%.o)
 
-PY = python
+PY = python3
 
 GEN = case-gen.py
 
