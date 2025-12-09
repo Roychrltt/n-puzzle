@@ -7,7 +7,8 @@ N-Puzzle is played on a square grid of size n × n with the follwing rules:
 - The board contains n² − 1 numbered tiles and one empty space
 - The goal is to put all numbered tiles in a spiral order
 - A move means to slide a numbered tile into the empty space, effectively swaps the tile and the empty
-</br>
+
+
 ![](images/puzzle.png)
 </br>
 This program aims to find a valid sequence of moves in order to reach the final state.
